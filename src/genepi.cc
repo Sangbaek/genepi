@@ -237,6 +237,8 @@ int main(int argc, char*argv[])
   double M_RECO(-1000.), M_RECO2(-1000.), M_TARG, M_TARG2;
   int    Ipn, Ims, RECO_ID(-1000), RECO_CH(-1000);
   double cosThetakkp, cosThetaqqp, cosThetakpqp;
+  int    NScale(100000);
+  double xsec_max(-1000);
   vector<double> v0(3,0);
 
   lujets_cc.N = 0;
@@ -269,7 +271,7 @@ int main(int argc, char*argv[])
     for(int jj=0; jj<4; jj++) hepevt.VHEP[ii][jj]   = 0;
   }
 
-  for(long long ievt=0; ievt<ro->get_fNevts(); ievt++)
+  for(long long ievt=0; ievt<NScale+ro->get_fNevts(); ievt++)
   {
     trk.Evt_ID  = ievt;
     trk.Bheli   = ro->get_fBheli();
@@ -278,13 +280,13 @@ int main(int argc, char*argv[])
     trk.ExcMS   = ro->get_fIms();
     Nevts_per_Ntup++;
 
-    if(ievt%ro->get_fPrint() == 0)
+    if(ievt%ro->get_fPrint() == 0 && ievt>=NScale)
     {
       cout<<"Processing Event: "<<ievt<<"/"<<ro->get_fNevts()<<endl;
       out0<<"Processing Event: "<<ievt<<"/"<<ro->get_fNevts()<<endl;
     }
 
-    if(ro->get_fAscii() != 0 && ievt%ro->get_fNevtsPerFile() == 0)
+    if(ro->get_fAscii() != 0 && ievt%ro->get_fNevtsPerFile() == 0 && ievt>=NScale)
     {
       if(run<10)
       {
@@ -438,11 +440,12 @@ int main(int argc, char*argv[])
     Q2max   = min(Q2max, ro->get_fQ2max());
     if(Q2 > Q2max || Q2 < Q2min)
     {
+      if (ievt>=NScale){
       cout<<"Event = "<<ievt<<"; Q2 out of range "<<
         Q2min<<" "<<Q2<<" "<<Q2max<<endl;
       out0<<"Event = "<<ievt<<"; Q2 out of range "<<
         Q2min<<" "<<Q2<<" "<<Q2max<<endl;
-
+      }
       outside_klim++;
       dv->init_dvcs();
       init_event();
@@ -456,10 +459,10 @@ int main(int argc, char*argv[])
     xmax  = min(xmax, ro->get_fXbjmax());
     if(xbj > xmax || xbj < xmin)
     {
-      cout<<"event "<<ievt<<"; xbj out of range "<<
-        xmin<<" "<<xbj<<" "<<xmax<<endl;
-      out0<<"event "<<ievt<<"; xbj out of range "<<
-        xmin<<" "<<xbj<<" "<<xmax<<endl;
+      // cout<<"event "<<ievt<<"; xbj out of range "<<
+      //   xmin<<" "<<xbj<<" "<<xmax<<endl;
+      // out0<<"event "<<ievt<<"; xbj out of range "<<
+      //   xmin<<" "<<xbj<<" "<<xmax<<endl;
 
       outside_klim++;
       dv->init_dvcs();
@@ -525,13 +528,14 @@ int main(int argc, char*argv[])
     double rndmt;
     rndmt = rndm.Rndm();
     t     = tmin + (tmax - tmin)*rndmt;
-    if(t > tmax || t < tmin)
+    if(t > tmax || t < tmin) 
     {
-      cout<<"event "<<ievt<<"; t out of range "<<
-        tmin<<" "<<t<<" "<<tmax<<endl;
-      out0<<"event "<<ievt<<"; t out of range "<<
-        tmin<<" "<<t<<" "<<tmax<<endl;
-
+      if (ievt>=NScale){
+            cout<<"event "<<ievt<<"; t out of range "<<
+              tmin<<" "<<t<<" "<<tmax<<endl;
+            out0<<"event "<<ievt<<"; t out of range "<<
+              tmin<<" "<<t<<" "<<tmax<<endl;
+      }
       outside_klim++;
       dv->init_dvcs();
       init_event();
@@ -544,11 +548,12 @@ int main(int argc, char*argv[])
     qp  = nup;
     if(nup > nupmax || nup < nupmin)
     {
-      cout<<"event "<<ievt<<"; nup out of range "<<
-        nupmin<<" "<<nup<<" "<<nupmax<<endl;
-      out0<<"event "<<ievt<<"; nup out of range "<<
-        nupmin<<" "<<nup<<" "<<nupmax<<endl;
-
+      if (ievt>=NScale){
+        cout<<"event "<<ievt<<"; nup out of range "<<
+          nupmin<<" "<<nup<<" "<<nupmax<<endl;
+        out0<<"event "<<ievt<<"; nup out of range "<<
+          nupmin<<" "<<nup<<" "<<nupmax<<endl;
+      }
       outside_klim++;
       dv->init_dvcs();
       init_event();
@@ -561,11 +566,12 @@ int main(int argc, char*argv[])
     Pp = sqrt(sqr(Ep) - m_targ(Ipn,2));
     if(Ep > Epmax || Ep < Epmin)
     {
-      cout<<"event "<<ievt<<"; Ep out of range "<<
-        Epmin<<" "<<Ep<<" "<<Epmax<<endl;
-      out0<<"event "<<ievt<<"; Ep out of range "<<
-        Epmin<<" "<<Ep<<" "<<Epmax<<endl;
-
+      if (ievt>=NScale){
+        cout<<"event "<<ievt<<"; Ep out of range "<<
+          Epmin<<" "<<Ep<<" "<<Epmax<<endl;
+        out0<<"event "<<ievt<<"; Ep out of range "<<
+          Epmin<<" "<<Ep<<" "<<Epmax<<endl;
+      }
       outside_klim++;
       dv->init_dvcs();
       init_event();
@@ -957,7 +963,15 @@ int main(int argc, char*argv[])
     {
       out0<<"You Should select a Process"<<endl;
     }
+    if (ievt<NScale){
+      if (xsec_max<xsec) xsec_max = xsec;
+      continue;
+    }
 
+    if (xsec<xsec_max*rndm.Rndm()){
+      out0<<ievt<<"-th event was rejected by maximal weights."<<endl;
+      continue;
+    }
     //fill track
     //be carefull here
     //get_ms() returns the particles coming out from the pi0/eta decay
