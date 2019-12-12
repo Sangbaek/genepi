@@ -237,8 +237,8 @@ int main(int argc, char*argv[])
   double M_RECO(-1000.), M_RECO2(-1000.), M_TARG, M_TARG2;
   int    Ipn, Ims, RECO_ID(-1000), RECO_CH(-1000);
   double cosThetakkp, cosThetaqqp, cosThetakpqp;
-  int    NScale(100000);
-  double xsec_max(-1000);
+  int    NScale(100000); // number of events used for calculating maximal weights
+  double xsec_max(-1000); // maximal weights.
   vector<double> v0(3,0);
 
   lujets_cc.N = 0;
@@ -963,11 +963,12 @@ int main(int argc, char*argv[])
     {
       out0<<"You Should select a Process"<<endl;
     }
+    // Store maximal weights
     if (ievt<NScale){
       if (xsec_max<xsec) xsec_max = xsec;
       continue;
     }
-
+    // select events by maximal weights
     if (xsec<xsec_max*rndm.Rndm()){
       out0<<ievt<<"-th event was rejected by maximal weights."<<endl;
       continue;
