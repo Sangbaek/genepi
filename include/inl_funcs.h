@@ -57,6 +57,12 @@ int inline hel3_id() {return 1234;}//FAKE
 int inline trit_id();
 int inline trit_id() {return 4321;}//FAKE
 
+int inline deut_id();
+int inline deut_id() {return 45;}//FAKE
+
+int inline twoprot_id();
+int inline twoprot_id() {return 4424;}//FAKE
+
 int inline neut_ch();
 int inline neut_ch() {return 0;}
 

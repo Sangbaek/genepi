@@ -180,6 +180,10 @@ int main(int argc, char*argv[])
   {
     target = "hel4";
   }
+  else if(iApZ == 5)
+  {
+    target = "hel3";
+  }
   out0<<"Target:  "<< target<<endl;
 
   int ntp_cnt(0);
@@ -369,6 +373,28 @@ int main(int argc, char*argv[])
 	M_RECO  = 2.*m_neut(1) + m_prot(1); //add binding energy
       }
     }
+
+    else if(iApZ == 5) //He3
+    {
+      //select which nucleon to interact with in case of nuclei target
+      double rndmnucl  = rndm.Rndm();
+      if(rndmnucl >= 0.5)
+      {
+        Ipn     = 0;
+        RECO_ID = twoprot_id();
+        RECO_CH = 2;
+  M_RECO  = 2*m_prot(1); //add binding energy
+      }
+      else if(rndmnucl < 0.5)
+      {
+        Ipn     = 1;
+        RECO_ID = deut_id();
+        RECO_CH = 1;
+  M_RECO  = m_prot(1) + m_neut(1); //add binding energy
+      }
+    }
+
+
 
     trk.Struck_Nucl = Ipn;
     M_TARG          = m_targ(Ipn,1.);
@@ -641,7 +667,7 @@ int main(int argc, char*argv[])
     Thetakpqp    = acos(cosThetakpqp);
 
 //START FERMI MOTION PART (for incoherent scattering off nucleus target)
-    if(iApZ == 3 || iApZ == 6)
+    if(iApZ == 3 || iApZ == 6 || iApZ ==5)
     {
       //generate initial nucleon momentum wrt the inc. elec. frame
       int ifermi(1);
@@ -654,6 +680,10 @@ int main(int argc, char*argv[])
       else if(iApZ == 6)
       {
         P = fer_mom_hel4(rnd);
+      }
+      else if(iApZ == 5)
+      {
+        P = fer_mom_hel3(rnd);
       }
       E = sqrt(sqr(P) + M_TARG2);
       
