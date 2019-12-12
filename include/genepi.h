@@ -22,6 +22,7 @@ void   prod_dir(string);
 
 double fer_mom_deut(int, double);
 double fer_mom_hel4(double);
+double fer_mom_hel3(double);
 int    fmotion(double, double, int, double, double, double, double, double, double, double, double, double*);
 
 double ups(double);
