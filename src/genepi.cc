@@ -378,14 +378,14 @@ int main(int argc, char*argv[])
     {
       //select which nucleon to interact with in case of nuclei target
       double rndmnucl  = rndm.Rndm();
-      if(rndmnucl >= 0.5)
+      if(rndmnucl >= 0.66667)
       {
         Ipn     = 0;
         RECO_ID = twoprot_id();
         RECO_CH = 2;
   M_RECO  = 2*m_prot(1); //add binding energy
       }
-      else if(rndmnucl < 0.5)
+      else if(rndmnucl < 0.66667)
       {
         Ipn     = 1;
         RECO_ID = deut_id();
