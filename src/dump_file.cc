@@ -43,10 +43,14 @@ void dump_file(int mode, double xsec)
     double vz=0;
     for(int i=0; i<trk.Ntracks; i++)
     {
-    if (i!=2 && i!=5 && i!=6 ) continue;
-    fprintf(ptr,"%5d %5d %5d %5d %5d %5d %15.8f %15.8f %15.8f %15.8f %5d %15.8f %15.8f %15.8f\n",
-        i, trk.Charge[i],1, trk.Type[i],0,0, trk.Px[i], trk.Py[i], trk.Pz[i], trk.E[i],sqrt(sqr(trk.E[i])-sqr(trk.P[i])),vx,vy,vz);
-    }
+      int index;
+      if (i==2) index=1;
+      else if (i==5) index=2;
+      else if (i==6) index=3;
+      else continue;
+      fprintf(ptr,"%5d %5d %5d %5d %5d %5d %15.8f %15.8f %15.8f %15.8f %5d %15.8f %15.8f %15.8f\n",
+          index, trk.Charge[i],1, trk.Type[i],0,0, trk.Px[i], trk.Py[i], trk.Pz[i], trk.E[i],sqrt(sqr(trk.E[i])-sqr(trk.P[i])),vx,vy,vz);
+      }
   }
 
 }
