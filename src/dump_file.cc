@@ -45,7 +45,7 @@ void dump_file(int mode, double xsec)
     {
     if (i!=2 && i!=5 && i!=6 ) continue;
     fprintf(ptr,"%5d %5d %5d %5d %5d %5d %15.8f %15.8f %15.8f %15.8f %5d %15.8f %15.8f %15.8f\n",
-        i, trk.Charge[i],1, trk.Type[i],0,0, trk.Px[i], trk.Py[i], trk.Pz[i], trk.E[i],sqrt(sqr(trk.E)-sqr(trk.P)),vx,vy,vz);
+        i, trk.Charge[i],1, trk.Type[i],0,0, trk.Px[i], trk.Py[i], trk.Pz[i], trk.E[i],sqrt(sqr(trk.E[i])-sqr(trk.P[i])),vx,vy,vz);
     }
   }
 
