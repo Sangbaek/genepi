@@ -3,7 +3,8 @@
 #include "hepevt.h"
 #include "track_vars.h"
 #include "dump_file.h"
-
+#include "root.h"
+#include "genepi.h"
 //void dump_file(int mode, double xsec, FILE *ptr)
 void dump_file(int mode, double xsec)
 {
@@ -35,14 +36,16 @@ void dump_file(int mode, double xsec)
     fprintf(ptr,"%6d %6d %6d %8.1f %8.1f %6d %8.3f %6d %6d %15.10f\n",
             3, trk.TarA, trk.TarZ, trk.Theli, trk.Bheli, 11, 
       trk.Eb, trk.Type[1],1, xsec);
-    double vx=rndm.Rndm()*0.75;
-    double vy=rndm.Rndm()*0.75;
+    TRandom1 rndm_vertex;
+    rndm_vertex.SetSeed(12345);
+    double vx=rndm_vertex.Rndm()*0.75;
+    double vy=rndm_vertex.Rndm()*0.75;
     double vz=0;
     for(int i=0; i<trk.Ntracks; i++)
     {
     if (i!=2 && i!=5 && i!=6 ) continue;
     fprintf(ptr,"%5d %5d %5d %5d %5d %5d %15.8f %15.8f %15.8f %15.8f %5d %15.8f %15.8f %15.8f\n",
-        i, trk.Charge[i],1, trk.Type[i],0,0 trk.Px[i], trk.Py[i], trk.Pz[i], trk.E[i],sqrt(sqr(trk.E)-sqr(trk.P)),vx,vy,vz);
+        i, trk.Charge[i],1, trk.Type[i],0,0, trk.Px[i], trk.Py[i], trk.Pz[i], trk.E[i],sqrt(sqr(trk.E)-sqr(trk.P)),vx,vy,vz);
     }
   }
 
