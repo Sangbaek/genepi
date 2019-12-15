@@ -7,7 +7,7 @@
 #include "inl_funcs.h"
 #include "lujets_cc.h"
 #include "jetset.h"
-#include "hepevt.h"
+#include "hepevt_genepi.h"
 
 #include "track_vars.h"
 #include "dvcs_vars.h"

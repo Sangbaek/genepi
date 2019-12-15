@@ -1,6 +1,6 @@
 #include "cpp.h"
 
-#include "hepevt.h"
+#include "hepevt_genepi.h"
 #include "track_vars.h"
 #include "dump_file.h"
 #include "root.h"
