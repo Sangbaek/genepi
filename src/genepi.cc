@@ -246,6 +246,8 @@ int main(int argc, char*argv[])
   double M_RECO(-1000.), M_RECO2(-1000.), M_TARG, M_TARG2;
   int    Ipn, Ims, RECO_ID(-1000), RECO_CH(-1000);
   double cosThetakkp, cosThetaqqp, cosThetakpqp;
+  int    NScale(100000); // number of events used for calculating maximal weights
+  double xsec_max(-1000); // maximal weights.
   vector<double> v0(3,0);
 
   lujets_cc.N = 0;
@@ -307,13 +309,13 @@ int main(int argc, char*argv[])
     trk.ExcMS   = ro->get_fIms();
     Nevts_per_Ntup++;
 
-    if(ievt%ro->get_fPrint() == 0)
+    if(ievt%ro->get_fPrint() == 0 && ievt>=NScale)
     {
       cout<<"Processing Event: "<<ievt<<"/"<<ro->get_fNevts()<<endl;
       out0<<"Processing Event: "<<ievt<<"/"<<ro->get_fNevts()<<endl;
     }
 
-    if(ro->get_fAscii() != 0 && ievt%ro->get_fNevtsPerFile() == 0)
+    if(ro->get_fAscii() != 0 && ievt%ro->get_fNevtsPerFile() == 0 && ievt>=NScale)
     {
       if(run<10)
       {
