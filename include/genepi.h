@@ -1,5 +1,6 @@
 #include "cpp.h"
 #include "root.h"
+#include "dvcs_vars.h"
 
 double sqr(double);
 double sign(double);
@@ -39,3 +40,5 @@ int    targ_ch(int);
 
 double m_ms(int, double);
 int    ms_id(int);
+
+void   get_scale(int);
