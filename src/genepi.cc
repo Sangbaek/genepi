@@ -95,12 +95,26 @@ double ds_int;
 double ds_tot;
 double ds_ms;
 
+double xsec;
+
 HEPEVT hepevt;
 TRACK trk;
 
 char fdump[1000];
 FILE *ptr;
 
+ReadOptFile *ro = new ReadOptFile();
+DVCS *dv        = new DVCS();
+NuclFF *ff      = new NuclFF();
+VECT *vect      = new VECT();
+TRandom1 rndm; 
+
+//for getting scale
+double smax(-1000);
+double stot(0);
+int trial(0);
+int trialmax(100000);
+double smax2(-1000);
 int main(int argc, char*argv[])
 {
   if(argc != 2)
@@ -110,11 +124,6 @@ int main(int argc, char*argv[])
     cout<<"./genepi.exe <Option_file>"<<endl;
     return 0;
   }
-
-  ReadOptFile *ro = new ReadOptFile();
-  DVCS *dv        = new DVCS();
-  NuclFF *ff      = new NuclFF();
-  VECT *vect      = new VECT();
 
   string InputFile = argv[1];
   if(fexist(InputFile.c_str()))
@@ -158,7 +167,6 @@ int main(int argc, char*argv[])
     seed = 12345;
   }
 
-  TRandom1 rndm; 
   rndm.SetSeed(seed);
 
   int iApZ = ro->get_fAt() + ro->get_fZt();
@@ -185,6 +193,7 @@ int main(int argc, char*argv[])
     target = "hel3";
   }
   out0<<"Target:  "<< target<<endl;
+
 
   int ntp_cnt(0);
   char root_file[1000];
@@ -268,9 +277,29 @@ int main(int argc, char*argv[])
     for(int jj=0; jj<5; jj++) hepevt.PHEP[ii][jj]   = 0;
     for(int jj=0; jj<4; jj++) hepevt.VHEP[ii][jj]   = 0;
   }
+  int ievt =-1;
+  // dv->phot_xsec(ro, ff, 0.5, 0.5, 5, -1, 0);
+  //   ds_bh   = dv->hc0_BH + dv->hc1_BH*cos(pi(1) - 0) + dv->hc2_BH*cos(2*(pi(1) - 0)) + 
+  //       ro->get_fBheli()*ro->get_fTheli()*(dv->hc0_BH_LP + dv->hc1_BH_LP*cos(pi(1) - 0));
 
-  for(long long ievt=0; ievt<ro->get_fNevts(); ievt++)
+  //   ds_dvcs = dv->hc0_DVCS + dv->hc1_DVCS*cos(pi(1) - 0) + ro->get_fBheli()*dv->hs1_DVCS*sin(pi(1) - 0) + 
+  //       ro->get_fBheli()*ro->get_fTheli()*(dv->hc0_DVCS_LP + dv->hc1_DVCS_LP*cos(pi(1) - 0)) + 
+  // ro->get_fTheli()*dv->hs1_DVCS_LP*sin(pi(1) - 0);
+
+  //   ds_int  = dv->hc0_Int + dv->hc1_Int*cos(pi(1) - 0) + dv->hc2_Int*cos(2*(pi(1) - 0)) + 
+  //       ro->get_fBheli()*(dv->hs1_Int*sin(pi(1) - 0) + dv->hs2_Int*sin(2*(pi(1) - 0))) + 
+  // ro->get_fBheli()*ro->get_fTheli()*(
+  // dv->hc0_Int_LP + dv->hc1_Int_LP*cos(pi(1) - 0) + dv->hc2_Int_LP*cos(2*(pi(1) - 0))) + 
+  // ro->get_fTheli()*(dv->hs1_Int_LP*sin(pi(1) - 0) + dv->hs2_Int_LP*sin(2*(pi(1) - 0)));
+
+  //   ds_tot  = ds_bh + ds_dvcs - ro->get_fBchg()*ds_int;
+  //   xsec = ds_tot;
+  //   cout<<xsec<<endl;
+  //   return 0;
+  while (Ngood_evts<ro->get_fNevts())
   {
+    xsec=0;
+    ievt++;
     trk.Evt_ID  = ievt;
     trk.Bheli   = ro->get_fBheli();
     trk.Theli   = ro->get_fTheli();
@@ -438,10 +467,10 @@ int main(int argc, char*argv[])
     Q2max   = min(Q2max, ro->get_fQ2max());
     if(Q2 > Q2max || Q2 < Q2min)
     {
-      cout<<"Event = "<<ievt<<"; Q2 out of range "<<
-        Q2min<<" "<<Q2<<" "<<Q2max<<endl;
-      out0<<"Event = "<<ievt<<"; Q2 out of range "<<
-        Q2min<<" "<<Q2<<" "<<Q2max<<endl;
+      // cout<<"Event = "<<ievt<<"; Q2 out of range "<<
+      //   Q2min<<" "<<Q2<<" "<<Q2max<<endl;
+      // out0<<"Event = "<<ievt<<"; Q2 out of range "<<
+      //   Q2min<<" "<<Q2<<" "<<Q2max<<endl;
 
       outside_klim++;
       dv->init_dvcs();
@@ -454,12 +483,13 @@ int main(int argc, char*argv[])
     xmin  = max(xmin, ro->get_fXbjmin());
     xmax  = ro->get_fEb()*(q - nu)/(M_TARG*nu);
     xmax  = min(xmax, ro->get_fXbjmax());
+    // cout<<"x min"<<"\t"<<ro->get_fEb()<<"\t"<<Q2<<"\t"<<M_TARG<<"\t"<<4.*sqr(ro->get_fEb())<<endl;
     if(xbj > xmax || xbj < xmin)
     {
-      cout<<"event "<<ievt<<"; xbj out of range "<<
-        xmin<<" "<<xbj<<" "<<xmax<<endl;
-      out0<<"event "<<ievt<<"; xbj out of range "<<
-        xmin<<" "<<xbj<<" "<<xmax<<endl;
+      // cout<<"event "<<ievt<<"; xbj out of range "<<
+      //   xmin<<" "<<xbj<<" "<<xmax<<endl;
+      // out0<<"event "<<ievt<<"; xbj out of range "<<
+      //   xmin<<" "<<xbj<<" "<<xmax<<endl;
 
       outside_klim++;
       dv->init_dvcs();
@@ -524,13 +554,14 @@ int main(int argc, char*argv[])
     //generate t
     double rndmt;
     rndmt = rndm.Rndm();
-    t     = tmin + (tmax - tmin)*rndmt;
+    // t     = tmin + (tmax - tmin)*rndmt;
+    t     = ro->get_ftmin() + (ro->get_ftmax() - ro->get_ftmin())*rndmt; // need simple phase space volume
     if(t > tmax || t < tmin)
     {
-      cout<<"event "<<ievt<<"; t out of range "<<
-        tmin<<" "<<t<<" "<<tmax<<endl;
-      out0<<"event "<<ievt<<"; t out of range "<<
-        tmin<<" "<<t<<" "<<tmax<<endl;
+      // cout<<"event "<<ievt<<"; t out of range "<<
+      //   tmin<<" "<<t<<" "<<tmax<<endl;
+      // out0<<"event "<<ievt<<"; t out of range "<<
+      //   tmin<<" "<<t<<" "<<tmax<<endl;
 
       outside_klim++;
       dv->init_dvcs();
@@ -544,10 +575,10 @@ int main(int argc, char*argv[])
     qp  = nup;
     if(nup > nupmax || nup < nupmin)
     {
-      cout<<"event "<<ievt<<"; nup out of range "<<
-        nupmin<<" "<<nup<<" "<<nupmax<<endl;
-      out0<<"event "<<ievt<<"; nup out of range "<<
-        nupmin<<" "<<nup<<" "<<nupmax<<endl;
+      // cout<<"event "<<ievt<<"; nup out of range "<<
+      //   nupmin<<" "<<nup<<" "<<nupmax<<endl;
+      // out0<<"event "<<ievt<<"; nup out of range "<<
+      //   nupmin<<" "<<nup<<" "<<nupmax<<endl;
 
       outside_klim++;
       dv->init_dvcs();
@@ -561,10 +592,10 @@ int main(int argc, char*argv[])
     Pp = sqrt(sqr(Ep) - m_targ(Ipn,2));
     if(Ep > Epmax || Ep < Epmin)
     {
-      cout<<"event "<<ievt<<"; Ep out of range "<<
-        Epmin<<" "<<Ep<<" "<<Epmax<<endl;
-      out0<<"event "<<ievt<<"; Ep out of range "<<
-        Epmin<<" "<<Ep<<" "<<Epmax<<endl;
+      // cout<<"event "<<ievt<<"; Ep out of range "<<
+      //   Epmin<<" "<<Ep<<" "<<Epmax<<endl;
+      // out0<<"event "<<ievt<<"; Ep out of range "<<
+      //   Epmin<<" "<<Ep<<" "<<Epmax<<endl;
 
       outside_klim++;
       dv->init_dvcs();
@@ -845,6 +876,7 @@ int main(int argc, char*argv[])
                      sin(Phikqp)*sin(Thetakqp)*sin(Phikkp)*sin(Thetakkp) +
                      cos(Thetakqp)*cos(Thetakkp);
       Thetakpqp    = acos(cosThetakpqp);
+
     }
 //END FERMI MOTION PART
 
@@ -893,7 +925,28 @@ int main(int argc, char*argv[])
 
     vPm = vect->init_vect();
     double Phi_b = Phiqqp;
-    double xsec;
+
+    //if(dv->phot_xsec(ro, ff, xbj, y, Q2, t, Phi_b) != 0 )
+    //1301.6  0.120     1.70  -0.500      6.283       6.108 
+
+    dv->phot_xsec(ro, ff, 0.5, 0.5, 5, -1, 0);
+    ds_bh   = dv->hc0_BH + dv->hc1_BH*cos(pi(1) - 0) + dv->hc2_BH*cos(2*(pi(1) - 0)) + 
+        ro->get_fBheli()*ro->get_fTheli()*(dv->hc0_BH_LP + dv->hc1_BH_LP*cos(pi(1) - 0));
+
+    ds_dvcs = dv->hc0_DVCS + dv->hc1_DVCS*cos(pi(1) - 0) + ro->get_fBheli()*dv->hs1_DVCS*sin(pi(1) - 0) + 
+        ro->get_fBheli()*ro->get_fTheli()*(dv->hc0_DVCS_LP + dv->hc1_DVCS_LP*cos(pi(1) - 0)) + 
+  ro->get_fTheli()*dv->hs1_DVCS_LP*sin(pi(1) - 0);
+
+    ds_int  = dv->hc0_Int + dv->hc1_Int*cos(pi(1) - 0) + dv->hc2_Int*cos(2*(pi(1) - 0)) + 
+        ro->get_fBheli()*(dv->hs1_Int*sin(pi(1) - 0) + dv->hs2_Int*sin(2*(pi(1) - 0))) + 
+  ro->get_fBheli()*ro->get_fTheli()*(
+  dv->hc0_Int_LP + dv->hc1_Int_LP*cos(pi(1) - 0) + dv->hc2_Int_LP*cos(2*(pi(1) - 0))) + 
+  ro->get_fTheli()*(dv->hs1_Int_LP*sin(pi(1) - 0) + dv->hs2_Int_LP*sin(2*(pi(1) - 0)));
+
+    ds_tot  = ds_bh + ds_dvcs - ro->get_fBchg()*ds_int;
+    xsec = ds_tot;
+    cout<<xsec<<endl;
+    // return 0;
     if(trk.Process == 0)
     {
       if(dv->phot_xsec(ro, ff, xbj, y, Q2, t, Phi_b) != 0 )
@@ -958,6 +1011,15 @@ int main(int argc, char*argv[])
       out0<<"You Should select a Process"<<endl;
     }
 
+
+    //assign weight by differential cross sections only.
+    if(trial<trialmax){
+      get_scale(ievt);
+      if (trial%1000==0) cout<<trial<<endl;
+      continue;
+    }
+    
+
     //fill track
     //be carefull here
     //get_ms() returns the particles coming out from the pi0/eta decay
@@ -981,7 +1043,6 @@ int main(int argc, char*argv[])
     trk.int_xsec      = ds_int;
     trk.tot_xsec      = ds_tot;
     trk.ms_xsec       = ds_ms;
-
     //inc. elec.
     trk.Type[0]   = elec_id();
     trk.Charge[0] = elec_ch();
@@ -1233,8 +1294,12 @@ int main(int argc, char*argv[])
       dump_file(ro->get_fMode(), xsec);
 
     }//if(ro->get_Ascii() != 0)
-
+    // cout<<trk.tot_xsec -xsec<<endl;
+    if (smax2<trk.tot_xsec) {
+      smax2=trk.tot_xsec;
+    }
     Ngood_evts++;
+    if(Ngood_evts==ro->get_fNevts())  cout<<"max"<<smax2*1000<<endl;
 
     if(trk.Struck_Nucl == 0)
     {
@@ -1361,3 +1426,19 @@ void dump_file(int mode, double xsec, FILE *ptr)
   }
 }
 */
+
+void get_scale(int ievt){
+  //Collect dsigma/dXbj/dt/dQ2/dPhi_e/dPhi_g (nb/GeV^-4)
+  if (smax<xsec) smax=xsec;
+  stot+=xsec;
+  trial++;
+  if (trial==trialmax){
+  stot*=(ro->get_fQ2max()-ro->get_fQ2min()); // PS Volume for Q2
+  stot*=(ro->get_fXbjmax()-ro->get_fXbjmin()); // PS volume for Xbj
+  stot*=(ro->get_ftmax()-ro->get_ftmin()); // PS Volume for t
+  stot*=2*pi(1); // PS Volume for Phi_e
+  stot*=2*pi(1); // PS Volume for Phi_g
+  stot*=1./(ievt+1); // average over points
+  cout<<"roi"<<stot*1000<<"\t"<<smax*1000<<endl; //in pb
+  }
+}
