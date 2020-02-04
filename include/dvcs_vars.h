@@ -1,3 +1,6 @@
+#ifndef __DVCS_VARS_H__
+#define __DVCS_VARS_H__
+
 #include "nucl_ff.h"
 #include "read_optFile.h"
 #define MAXSK   51
@@ -96,3 +99,5 @@ public:
   double get_im_HuNF(int i,int j,int k) {return im_HuNF[i][j][k];}
   double get_im_HdNF(int i,int j,int k) {return im_HdNF[i][j][k];}
 };
+
+#endif

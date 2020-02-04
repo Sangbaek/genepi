@@ -56,6 +56,10 @@ int ReadOptFile::ReadInputFile(const char* inpfile)
   {
     target = "hel4";
   }
+  else if(iApZ == 5)
+  {
+    target = "hel3";
+  }
   else
   {
     cout<<"invalid target"<<endl;
